@@ -332,3 +332,6 @@ src/main/resources/static/file/profile/**
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,windows,intellij+all,eclipse,java,visualstudiocode,sonarqube,gradle,maven
 /src/main/resources/noteu-1a7a6-firebase-adminsdk-9xsb2-176f777273.json
+
+# Generated local load-test login sessions
+/load-gen/sessions.json

@@ -1,0 +1,36 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: noteu-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: noteu
+      MYSQL_USER: noteu
+      MYSQL_PASSWORD: noteu
+    ports:
+      - "3307:3306"   # 로컬 3306 충돌 회피
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    volumes:
+      - noteu-mysql-data:/var/lib/mysql
+
+  app:
+    build: .
+    container_name: noteu-app
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    # CPU 측정 안정화: 1코어로 고정 → docker stats의 %가 호스트 코어 수와 무관하게 비교 가능
+    cpus: 1.0
+    mem_limit: 2g
+    volumes:
+      - ./docker/config:/app/config:ro
+
+volumes:
+  noteu-mysql-data:

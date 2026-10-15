@@ -51,6 +51,24 @@ public class ChatRoomController {
         return restChatService.findAllById(subjectId, memberInfo.getId());
     }
 
+    // 성능 비교용: 자기 조인 단일 쿼리("1쿼리안") — /rooms(2쿼리안)와 나란히 두고 측정용
+    @GetMapping("/rooms/single")
+    @ResponseBody
+    public ChatRoomInfoResponseDto getAllRoomSingleQuery(@PathVariable("subject-id") Long subjectId,
+                                              @AuthenticationPrincipal MemberInfo memberInfo) {
+
+        return restChatService.findAllByIdSingleQuery(subjectId, memberInfo.getId());
+    }
+
+    // 성능 비교용: "v2" — 별칭 분리 + ON 절 상관 서브쿼리 단일 쿼리
+    @GetMapping("/rooms/v2")
+    @ResponseBody
+    public ChatRoomInfoResponseDto getAllRoomV2(@PathVariable("subject-id") Long subjectId,
+                                                @AuthenticationPrincipal MemberInfo memberInfo) {
+
+        return restChatService.findAllByIdV2(subjectId, memberInfo.getId());
+    }
+
     // 같은반 친구들 목록 반환
     @GetMapping("/friends")
     @ResponseBody
