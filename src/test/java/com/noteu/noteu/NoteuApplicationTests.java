@@ -7,7 +7,8 @@ import org.springframework.context.ApplicationContext;
 
 import java.util.Arrays;
 
-@SpringBootTest
+// Load only test configuration, even when a developer has a local application.yml with real DB settings.
+@SpringBootTest(properties = "spring.config.location=classpath:application-test.yml")
 class NoteuApplicationTests {
 
     @Autowired

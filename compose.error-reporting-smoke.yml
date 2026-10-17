@@ -1,0 +1,14 @@
+# 기존 noteu 컨테이너/DB와 구분하려면 반드시 아래 프로젝트 이름으로 실행합니다.
+# docker compose -p noteu-error-reporting-smoke -f docker-compose.yml \
+#   -f compose.error-reporting.yml -f compose.error-reporting-smoke.yml up -d --build
+# Compose 2.24.4 이상(!override 지원)이 필요합니다.
+services:
+  mysql:
+    container_name: noteu-error-reporting-smoke-mysql
+    ports: !override
+      - "127.0.0.1:13307:3306"
+  app:
+    image: noteu-error-reporting:local
+    container_name: noteu-error-reporting-smoke-app
+    ports: !override
+      - "127.0.0.1:18080:8080"

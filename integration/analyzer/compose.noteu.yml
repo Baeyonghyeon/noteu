@@ -1,0 +1,15 @@
+# bdd-gap-analyzer/compose.yaml과 함께 사용하는 선택적 오버레이입니다.
+# API만 noteu와 공유하며 PostgreSQL의 기존 네트워크는 유지합니다.
+services:
+  api:
+    networks:
+      default: {}
+      error-reporting:
+        aliases:
+          - bdd-analyzer
+
+networks:
+  default: {}
+  error-reporting:
+    external: true
+    name: bdd-error-reporting

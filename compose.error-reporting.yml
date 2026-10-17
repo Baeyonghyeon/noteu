@@ -1,0 +1,18 @@
+# 기존 docker-compose.yml에 덧붙여 사용할 때만 오류 수집을 활성화합니다.
+services:
+  app:
+    environment:
+      NOTEU_ERRORREPORTING_ENABLED: ${NOTEU_ERROR_REPORTING_ENABLED:-true}
+      NOTEU_ERRORREPORTING_ENDPOINT: http://bdd-analyzer:8000/events
+      NOTEU_ERRORREPORTING_SERVICE: noteu
+      NOTEU_ERRORREPORTING_ENVIRONMENT: local
+      NOTEU_ERRORREPORTING_DEPLOYSHA: ${NOTEU_DEPLOY_SHA:-local-development}
+    networks:
+      default: {}
+      error-reporting: {}
+
+networks:
+  default: {}
+  error-reporting:
+    external: true
+    name: bdd-error-reporting

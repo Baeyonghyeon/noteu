@@ -1,0 +1,37 @@
+# Tests use a disposable in-memory database and synthetic OAuth settings only.
+spring:
+  datasource:
+    url: jdbc:h2:mem:noteu-test;MODE=MySQL;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.H2Dialect
+  sql:
+    init:
+      mode: never
+  servlet:
+    multipart:
+      location: ${java.io.tmpdir}
+  security:
+    oauth2:
+      client:
+        registration:
+          test-provider:
+            client-id: test-client
+            client-secret: test-secret
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope: profile
+            provider: test-provider
+        provider:
+          test-provider:
+            authorization-uri: https://invalid.example/authorize
+            token-uri: https://invalid.example/token
+            user-info-uri: https://invalid.example/user
+            user-name-attribute: id
+noteu:
+  error-reporting:
+    enabled: false

@@ -1,0 +1,8 @@
+# 분석기 config/evidence.toml의 기존 version과 routes를 유지하고 이 항목을 추가합니다.
+# 근거 파일은 분석기 evidence/noteu/chat-rooms/에 복사합니다.
+[[routes]]
+service = "noteu"
+method = "GET"
+route = "/subjects/{subject-id}/chats/rooms"
+specification = "noteu/chat-rooms/specification.md"
+bdd = "noteu/chat-rooms/existing.feature"
