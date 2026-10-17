@@ -40,9 +40,24 @@ method: GET
 route_template: /subjects/{subject-id}/chats/rooms
 ```
 
-`integration/analyzer/evidence/noteu/chat-rooms/`를 분석기 프로젝트의 `evidence/noteu/chat-rooms/`에 복사하고, `integration/analyzer/noteu-routes.toml`의 `[[routes]]` 항목을 분석기 `config/evidence.toml`에 추가한다. 기존 `version = 1`과 주문 서비스 매핑은 유지하고 같은 항목을 중복 추가하지 않는다.
+`integration/analyzer/evidence/noteu/chat-rooms/`가 근거의 원본이다. `integration/analyzer/compose.noteu.yml`은 이 폴더를 분석기 API의 `/app/evidence/noteu`에 읽기 전용으로 마운트한다. 상대 경로는 첫 번째 Compose 파일인 분석기 `compose.yaml`의 디렉터리를 기준으로 해석되며 두 프로젝트가 같은 상위 폴더에 있어야 한다. 다른 위치에서는 해당 오버레이의 bind source를 실제 noteu 경로로 지정한다. 호스트 폴더가 없으면 실행을 실패시켜 빈 폴더가 자동 생성되지 않도록 했다.
 
-이 초기 명세는 소스에서 관찰한 사실과 정책 미확정 항목을 구분한다. `existing.feature`에는 가져온 기존 BDD 시나리오가 없다는 설명만 있다. 실제 기획 명세와 승인된 BDD가 준비되면 해당 파일을 교체한다. 파일을 바꾼 뒤에는 분석기 API를 재시작해야 새 입력에 반영된다.
+`integration/analyzer/noteu-routes.toml`의 `[[routes]]` 항목을 분석기 `config/evidence.toml`에 추가한다. 기존 `version = 1`과 주문 서비스 매핑을 유지하고 중복 추가하지 않는다. 이 환경에는 해당 매핑이 이미 등록되어 있다.
+
+- `specification.md`: 기존 개발 문서의 요구사항, 사용자 확인 정책, 코드 관찰, 미확정 정책을 구분한다.
+- `existing.feature`: 실제 기존 테스트의 검사 범위를 주석에 담는다. 현재 채팅방 업무 Scenario는 0개이며, 오류 수집용 가상 컨트롤러 테스트를 실제 업무 BDD로 변환하지 않는다.
+- `test-inventory.md`: 테스트/측정/수동 기록의 상세 출처와 한계를 사람이 확인한다.
+- `source-index.json`: 검토한 소스 18개의 해시와 범위를 기록한다. 이 파일 자체는 LLM에 전달되지 않으며 핵심 출처와 한계는 명세·BDD에도 적혀 있다.
+
+```bash
+python3 scripts/verify-analyzer-evidence.py
+```
+
+위 명령은 근거를 작성한 뒤 출처 코드가 달라졌는지 검사한다. 코드 해석이나 명세 갱신을 자동으로 하지는 않는다. 변경된 파일이 있으면 근거 문서를 함께 검토한다. 현재 근거 감사는 소스 기준 `9bbbfdb`를 사용한다. 다른 배포에서 발생한 오류를 분석할 때에는 해당 배포 코드와 근거가 맞는지 확인한다.
+
+LLM에는 `specification.md`와 `existing.feature` 원문이 함께 전달된다. 기존 Java 테스트나 세션 파일을 통째로 외부에 전송하지 않는다. 인증·세션 값이 들어 있는 수동 HTTP 요청 파일 역시 원문을 연결하지 않는다.
+
+자료를 수정한 뒤에는 분석기 API를 재시작해야 새 입력에 반영된다. 이미 생성된 작업은 DB에 저장한 당시 스냅샷을 계속 사용한다. 따라서 8번 작업의 결과는 유지되고, 이후 같은 오류가 들어와도 명세·BDD·프롬프트가 바뀌면 새 분석 기준으로 작업을 만든다. 동일한 새 기준의 반복 오류는 다시 한 작업으로 묶인다.
 
 다른 API도 수집될 수 있지만, 분석기에 정확한 서비스·메서드·라우트 매핑이 없으면 `422`로 거절되어 저장되지 않는다. 더 많은 API를 연결하려면 각 API의 명세·BDD와 `[[routes]]` 매핑을 추가한다. 분석기에서 작업을 등록하는 단계에는 LLM 호출이 없으며, LLM 분석은 워커가 대기 작업을 가져갈 때 실행된다.
 

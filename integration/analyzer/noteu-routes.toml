@@ -1,5 +1,5 @@
 # 분석기 config/evidence.toml의 기존 version과 routes를 유지하고 이 항목을 추가합니다.
-# 근거 파일은 분석기 evidence/noteu/chat-rooms/에 복사합니다.
+# compose.noteu.yml이 noteu 저장소의 근거 원본을 /app/evidence/noteu에 읽기 전용으로 연결합니다.
 [[routes]]
 service = "noteu"
 method = "GET"
