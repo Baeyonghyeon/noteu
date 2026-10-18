@@ -1,6 +1,7 @@
 package com.noteu.noteu.error.reporting;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;
 
@@ -13,7 +14,15 @@ public record ErrorEvent(
         @JsonProperty("deploy_sha") String deploySha,
         Request request,
         Response response,
-        Error error) {
+        Error error,
+        @JsonProperty("business_context") @JsonInclude(JsonInclude.Include.NON_NULL)
+        ChatRoomBusinessContext businessContext) {
+
+    /** Preserve the existing event schema for endpoints without business context. */
+    public ErrorEvent(String eventId, String service, String environment, String occurredAt,
+                      String deploySha, Request request, Response response, Error error) {
+        this(eventId, service, environment, occurredAt, deploySha, request, response, error, null);
+    }
 
     public record Request(String method, String path,
                           @JsonProperty("route_template") String routeTemplate,

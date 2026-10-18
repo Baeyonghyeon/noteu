@@ -41,6 +41,9 @@ public class ErrorReportingInterceptor implements AsyncHandlerInterceptor {
                         UUID.randomUUID().toString(), Instant.now().toString(),
                         bounded(request.getMethod(), 16), bounded(request.getRequestURI().replaceAll(";[^/]*", ""), 2048),
                         bounded(pattern.toString(), 2048)));
+                if ("GET".equals(request.getMethod()) && ChatRoomBusinessContext.ROUTE.equals(pattern.toString())) {
+                    ChatRoomBusinessContext.initialize(request);
+                }
             }
         }
         return true;
@@ -73,7 +76,7 @@ public class ErrorReportingInterceptor implements AsyncHandlerInterceptor {
             reporter.report(new ErrorEvent(context.eventId, properties.getService(), properties.getEnvironment(),
                     context.occurredAt, properties.getDeploySha(),
                     new ErrorEvent.Request(context.method, context.path, context.routeTemplate, null),
-                    new ErrorEvent.Response(status), error));
+                    new ErrorEvent.Response(status), error, ChatRoomBusinessContext.snapshot(request)));
         } catch (RuntimeException reportingFailure) {
             // Reporting is observational; it must not replace a controller response or exception.
             log.warn("Error reporting failed while capturing a request; existing response preserved");

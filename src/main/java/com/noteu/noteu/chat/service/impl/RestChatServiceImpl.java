@@ -1,6 +1,7 @@
 package com.noteu.noteu.chat.service.impl;
 
 import com.noteu.noteu.chat.converter.ChatConverter;
+import com.noteu.noteu.error.reporting.ChatRoomBusinessContext;
 import com.noteu.noteu.chat.dto.ChatRoomResponse;
 import com.noteu.noteu.chat.dto.response.ChatMessageResponseDto;
 import com.noteu.noteu.chat.dto.response.ChatRoomInfoResponseDto;
@@ -54,6 +55,10 @@ public class RestChatServiceImpl implements RestChatService {
     @Override
     public ChatRoomInfoResponseDto findAllById(Long subjectId, Long loginId) {
         List<ChatRoom> chatRooms = chatRoomRepository.findAllBySubjectId(subjectId, loginId);   // 쿼리 1 (fetch join 포함)
+        // An empty list proves neither a missing subject nor missing enrollment.
+        if (!chatRooms.isEmpty()) {
+            ChatRoomBusinessContext.observeExistingSubject();
+        }
 
         List<Long> roomIds = chatRooms.stream().map(ChatRoom::getId).toList();
         Map<Long, ChatMessage> lastMessageByRoomId = roomIds.isEmpty()
